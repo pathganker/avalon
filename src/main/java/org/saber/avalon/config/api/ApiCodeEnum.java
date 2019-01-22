@@ -12,7 +12,7 @@ package org.saber.avalon.config.api;
  */
 public enum ApiCodeEnum {
 	/** 成功 */
-	SUCCESS("200"),
+	SUCCESS("200"), 
 	/** 用户名和密码错误 请输入正确的用户名和密码 */
 	USER_NAME_OR_PWD("101"),
 	/** Token失效 请重新登陆 */

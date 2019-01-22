@@ -1,29 +1,76 @@
-/**
- * 
- */
 package org.saber.avalon.service.api;
 
-/**   
+import org.saber.avalon.exception.api.TokenException;
+
+/**
+ * 
  * @ClassName:  ITokenService   
  * @Description:TODO
  * @author: lijunliang 
- * @date:   2019年1月20日 下午6:03:48   
- *     
+ * @date:   2019年1月21日 下午11:23:47   
+ *
  */
+  	
 public interface ITokenService {
-
-	/**   
+	
+	 
+	/**
+	 * 
+	 * @Title: insertToken   
+	 * @Description: TODO
+	 * @author: lijunliang 
+	 * @date:   2019年1月21日 下午11:24:05   
+	 * @param: @param diviceId
+	 * @param: @param userId
+	 * @param: @return
+	 * @param: @throws TokenException      
+	 * @return: String      
+	 * @throws
+	 */
+	  	
+	public String insertToken(String diviceId, String userId)throws TokenException;
+	 
+	/**
+	 * 
 	 * @Title: checkToken   
 	 * @Description: TODO
 	 * @author: lijunliang 
-	 * @date:   2019年1月20日 下午6:05:40   
+	 * @date:   2019年1月21日 下午11:24:12   
 	 * @param: @param diviceId
 	 * @param: @param token
-	 * @param: @return      
+	 * @param: @return
+	 * @param: @throws TokenException      
 	 * @return: boolean      
-	 * @throws   
+	 * @throws
 	 */
-	boolean checkToken(String diviceId, String token);
-
-
+	  	
+	public boolean  checkToken(String diviceId, String token) throws TokenException;
+	 
+	/**
+	 * 
+	 * @Title: requestUserIdByToken   
+	 * @Description: TODO
+	 * @author: lijunliang 
+	 * @date:   2019年1月21日 下午11:24:18   
+	 * @param: @param token
+	 * @param: @return
+	 * @param: @throws TokenException      
+	 * @return: String      
+	 * @throws
+	 */
+	  	
+	public String requestUserIdByToken(String token) throws TokenException;
+	/**
+	 * 
+	 * @Title: deleteToken   
+	 * @Description: TODO
+	 * @author: lijunliang 
+	 * @date:   2019年1月22日 上午12:36:53   
+	 * @param: @param token
+	 * @param: @return
+	 * @param: @throws TokenException      
+	 * @return: boolean      
+	 * @throws
+	 */
+	public boolean deleteToken(String token) throws TokenException;
 }

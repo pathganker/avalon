@@ -10,6 +10,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
+import org.saber.avalon.config.api.ApiCodeEnum;
+import org.saber.avalon.exception.api.TokenException;
 import org.saber.avalon.pojo.Result;
 import org.saber.avalon.service.api.ITokenService;
 import org.slf4j.Logger;
@@ -52,23 +54,23 @@ public class TokenInterceptor extends HandlerInterceptorAdapter{
 					if(tokenService.checkToken(diviceId, token)){
 						return true;
 					}else {
-						rt.setCode(ApiCode.TOKEN_TIME_OUT.getErrorCode());//时间戳问题
+						rt.setCode(ApiCodeEnum.TOKEN_TIME_OUT);//时间戳问题
 						handlerReturnJSON(response,rt);
 					}
 				} catch (TokenException e) {
-					rt.setCode(e.getEc().getErrorCode());//参数问题
+					rt.setCode(e.getEc());//参数问题
 					handlerReturnJSON(response,rt);
 				LOGGER.info("token验证异常：{}",JSON.toJSONString(rt),e);
 				}
 			}else if (StringUtils.isBlank(token)) {
-				rt.setCode(ApiCode.TOKEN_LOST.getErrorCode());//token丢失
+				rt.setCode(ApiCodeEnum.TOKEN_LOST);//token丢失
 				handlerReturnJSON(response,rt);
 			}
-			rt.setCode(ApiCode.DEVICE_ID_NULL.getErrorCode());//设备id为空
+			rt.setCode(ApiCodeEnum.DEVICE_ID_NULL);//设备id为空
 			handlerReturnJSON(response,rt);
 			return false;
 		} catch (Exception e) {
-			rt.setCode(ApiCode.SERVICE_WRONG.getErrorCode());//token丢失
+			rt.setCode(ApiCodeEnum.SERVICE_WRONG);//token丢失
 			handlerReturnJSON(response,rt);
 			LOGGER.info("token验证异常：{}",JSON.toJSONString(rt),e);
 			return false;
@@ -86,7 +88,7 @@ public class TokenInterceptor extends HandlerInterceptorAdapter{
 	 * 返回类型  void
 	 */
 
-	private void handlerReturnJSON(HttpServletResponse response, ResultVO rt) {
+	private void handlerReturnJSON(HttpServletResponse response, Result rt) {
 //		response.setCharacterEncoding("UTF-8");
 		response.setContentType("application/json; charset=utf-8");
 		PrintWriter out = null;
