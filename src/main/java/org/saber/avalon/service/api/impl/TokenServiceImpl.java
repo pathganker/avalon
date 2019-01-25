@@ -161,7 +161,7 @@ public class TokenServiceImpl implements ITokenService{
 		if(StringUtils.isNotBlank(token)) {
 			try {
 				String tk = redis.opsForValue().get(SABER_API_TOKEN_KEY_PREFIX + token); //获取保存的token
-				if (StringUtils.isNotBlank(tk)&&tk.contains("&") ) { //TOKEN和redis中的一致则返回存在
+				if (StringUtils.isNotBlank(tk)) { 
 					redis.delete(SABER_API_TOKEN_KEY_PREFIX + token);
 					return true;
 				}else {

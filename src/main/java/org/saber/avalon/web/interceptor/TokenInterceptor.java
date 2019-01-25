@@ -34,10 +34,10 @@ public class TokenInterceptor extends HandlerInterceptorAdapter{
 	private static final Logger	LOGGER = LoggerFactory.getLogger(TokenInterceptor.class);
 	
 	/** TOKEN标记名*/
-	private static final String PARAMTER_TOKEN_NAME = "token";
+	private static final String PARAMTER_TOKEN_NAME = "Auth-Token";
 	
 	/** DIVICEID标记名*/
-	private static final String PARAMTER_DIVICEID_NAME = "deviceId";
+	private static final String PARAMTER_DIVICEID_NAME = "Auth-Device";
 	
 	/** TOKEN验证服务*/
 	@Autowired
@@ -47,8 +47,8 @@ public class TokenInterceptor extends HandlerInterceptorAdapter{
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler){
 		Result rt= new Result();
 		try {
-			String token = request.getParameter(PARAMTER_TOKEN_NAME);
-			String diviceId=request.getParameter(PARAMTER_DIVICEID_NAME);
+			String token = request.getHeader(PARAMTER_TOKEN_NAME);
+			String diviceId=request.getHeader(PARAMTER_DIVICEID_NAME);
 			if (StringUtils.isNotBlank(token)&&StringUtils.isNotBlank(diviceId)) {
 				try {
 					if(tokenService.checkToken(diviceId, token)){
@@ -56,15 +56,20 @@ public class TokenInterceptor extends HandlerInterceptorAdapter{
 					}else {
 						rt.setCode(ApiCodeEnum.TOKEN_TIME_OUT);//时间戳问题
 						handlerReturnJSON(response,rt);
+						LOGGER.info("token验证错误:{}",JSON.toJSONString(rt));
+						return false;
 					}
 				} catch (TokenException e) {
 					rt.setCode(e.getEc());//参数问题
 					handlerReturnJSON(response,rt);
-				LOGGER.info("token验证异常：{}",JSON.toJSONString(rt),e);
+					LOGGER.info("token验证异常:{}",JSON.toJSONString(rt),e);
+					return false;
 				}
 			}else if (StringUtils.isBlank(token)) {
 				rt.setCode(ApiCodeEnum.TOKEN_LOST);//token丢失
 				handlerReturnJSON(response,rt);
+				LOGGER.info("token验证错误:{}",JSON.toJSONString(rt));
+				return false;
 			}
 			rt.setCode(ApiCodeEnum.DEVICE_ID_NULL);//设备id为空
 			handlerReturnJSON(response,rt);
@@ -72,7 +77,7 @@ public class TokenInterceptor extends HandlerInterceptorAdapter{
 		} catch (Exception e) {
 			rt.setCode(ApiCodeEnum.SERVICE_WRONG);//token丢失
 			handlerReturnJSON(response,rt);
-			LOGGER.info("token验证异常：{}",JSON.toJSONString(rt),e);
+			LOGGER.info("token验证异常:{}",JSON.toJSONString(rt),e);
 			return false;
 		}
 	}
