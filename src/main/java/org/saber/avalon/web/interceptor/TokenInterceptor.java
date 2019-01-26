@@ -17,6 +17,7 @@ import org.saber.avalon.service.api.ITokenService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import com.alibaba.fastjson.JSON;
@@ -29,6 +30,7 @@ import com.alibaba.fastjson.JSON;
  * @date:   2018年10月25日 下午6:03:18   
  *     
  */
+@Component
 public class TokenInterceptor extends HandlerInterceptorAdapter{
 	/** 日志打印*/
 	private static final Logger	LOGGER = LoggerFactory.getLogger(TokenInterceptor.class);
@@ -51,7 +53,7 @@ public class TokenInterceptor extends HandlerInterceptorAdapter{
 			String diviceId=request.getHeader(PARAMTER_DIVICEID_NAME);
 			if (StringUtils.isNotBlank(token)&&StringUtils.isNotBlank(diviceId)) {
 				try {
-					if(tokenService.checkToken(diviceId, token)){
+					if(this.tokenService.checkToken(diviceId, token)){
 						return true;
 					}else {
 						rt.setCode(ApiCodeEnum.TOKEN_TIME_OUT);//时间戳问题
