@@ -77,20 +77,20 @@ public class TokenServiceImpl implements ITokenService{
 	/**   
 	 * <p>Title: checkToken</p>   
 	 * <p>Description: </p>   
-	 * @param diviceId
+	 * @param deviceId
 	 * @param token
 	 * @return
 	 * @throws TokenException   
 	 * @see org.saber.avalon.service.api.ITokenService#checkToken(java.lang.String, java.lang.String)   
 	 */
 	@Override
-	public boolean checkToken(String diviceId, String token) throws TokenException {
-		if (StringUtils.isNotBlank(diviceId) && StringUtils.isNotBlank(token)) {
+	public boolean checkToken(String deviceId, String token) throws TokenException {
+		if (StringUtils.isNotBlank(deviceId) && StringUtils.isNotBlank(token)) {
 			String tk="";
 			String device="";
 			try {
 				tk = redis.opsForValue().get(SABER_API_TOKEN_KEY_PREFIX + token); //获取保存的token
-				LOGGER.debug("checkToken start:{},diviceId:{}", tk, diviceId);				
+				LOGGER.info("checkToken start:{},diviceId:{}", token, deviceId);				
 			}catch (Exception e) {
 				LOGGER.error("redis访问异常{}", token);
 				throw new TokenException(ApiCodeEnum.SERVICE_WRONG);
@@ -99,24 +99,24 @@ public class TokenServiceImpl implements ITokenService{
 				device=tk.split("&")[0]; //获取返回的结果中的DIVICEID
 			}
 			if(StringUtils.isNotBlank(device)){					
-				if (device.trim().equals(diviceId.trim())) { //TOKEN和redis中的一致则返回存在
+				if (device.trim().equals(deviceId.trim())) { //TOKEN和redis中的一致则返回存在
 					redis.opsForValue().set(SABER_API_TOKEN_KEY_PREFIX + token,tk, SABER_API_TOKEN_ACTIVE_SECONED, TimeUnit.SECONDS);
-					LOGGER.debug("checkToken end:{},diviceId:{}", tk, diviceId);	
+					LOGGER.info("checkToken end:{},diviceId:{}", token, deviceId);	
 					return true;
 				} else {
-					LOGGER.error("token失效参数 设备id：{};输入token:{}", diviceId, token);
+					LOGGER.error("token失效参数 设备id：{};输入token:{}", deviceId, token);
 					throw new TokenException(ApiCodeEnum.CHANGE_DEVICE); //TOKEN超时
 				}
 			}else{
-				LOGGER.warn("token失效参数 设备id：{};输入token:{}", diviceId, token);
-				throw new TokenException(ApiCodeEnum.TOKEN_TIME_OUT); //TOKEN超时
+				LOGGER.warn("token失效参数 设备id：{};输入token:{}", deviceId, token);
+				return false;
 			}
 		} else if (StringUtils.isBlank(token)) {
-			LOGGER.warn("token失效参数 设备id：{};输入token:{}", diviceId, token);
-			throw new TokenException(ApiCodeEnum.TOKEN_LOST); //TOKEN丢失
+			LOGGER.warn("token失效参数 设备id：{};输入token:{}", deviceId, token);
+			return false;
 		} else {
-			LOGGER.warn("token失效参数 设备id：{};输入token:{}", diviceId, token);
-			throw new TokenException(ApiCodeEnum.ARGS_WRONG); //参数异常
+			LOGGER.warn("token失效参数 设备id：{};输入token:{}", deviceId, token);
+			return false;
 		}
 	}
 

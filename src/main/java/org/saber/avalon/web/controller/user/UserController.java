@@ -18,6 +18,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("user")
 public class UserController {
+	
+	/**
+	 * 
+	 * 方法名:  getUserInfo  
+	 * 描述:    TODO
+	 * 创建人：	lijunliang
+	 * 创建时间:  2019年1月27日下午2:25:44
+	 * 修改时间:    
+	 * 参数:  @return  
+	 * 返回类型  Result
+	 */
 	@RequestMapping(value="info")
 	public Result getUserInfo() {
 		Result rs = new Result();

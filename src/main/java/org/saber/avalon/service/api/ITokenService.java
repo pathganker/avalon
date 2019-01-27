@@ -36,7 +36,7 @@ public interface ITokenService {
 	 * @Description: TODO
 	 * @author: lijunliang 
 	 * @date:   2019年1月21日 下午11:24:12   
-	 * @param: @param diviceId
+	 * @param: @param deviceId
 	 * @param: @param token
 	 * @param: @return
 	 * @param: @throws TokenException      
@@ -44,7 +44,7 @@ public interface ITokenService {
 	 * @throws
 	 */
 	  	
-	public boolean  checkToken(String diviceId, String token) throws TokenException;
+	public boolean  checkToken(String deviceId, String token) throws TokenException;
 	 
 	/**
 	 * 

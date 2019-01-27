@@ -25,13 +25,14 @@ import com.alibaba.fastjson.JSON;
 
 /**   
  * @ClassName:  TokenInterceptor   
- * @Description:TODO
+ * @Description:  Token拦截器
  * @author: lijunliang 
  * @date:   2018年10月25日 下午6:03:18   
  *     
  */
 @Component
 public class TokenInterceptor extends HandlerInterceptorAdapter{
+	
 	/** 日志打印*/
 	private static final Logger	LOGGER = LoggerFactory.getLogger(TokenInterceptor.class);
 	
@@ -86,7 +87,7 @@ public class TokenInterceptor extends HandlerInterceptorAdapter{
 	/**
 	 * 
 	 * 方法名:  handlerReturnJSON  
-	 * 描述:    TODO
+	 * 描述:    返回JSON格式数据
 	 * 创建人：	lijunliang
 	 * 创建时间:  2019年1月11日下午2:15:54
 	 * 修改时间:    
@@ -96,7 +97,6 @@ public class TokenInterceptor extends HandlerInterceptorAdapter{
 	 */
 
 	private void handlerReturnJSON(HttpServletResponse response, Result rt) {
-//		response.setCharacterEncoding("UTF-8");
 		response.setContentType("application/json; charset=utf-8");
 		PrintWriter out = null;
 		try {

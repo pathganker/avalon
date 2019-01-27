@@ -5,6 +5,7 @@ package org.saber.avalon.web.controller.login;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.StringUtils;
 import org.saber.avalon.config.api.ApiCodeEnum;
 import org.saber.avalon.exception.api.TokenException;
 import org.saber.avalon.pojo.Result;
@@ -50,15 +51,25 @@ public class LoginController {
 	public Result login(HttpServletRequest request, String username, 
 			String password) {
 		Result result = new Result();
-		if(request.getHeaderNames().hasMoreElements()) {
-			LOGGER.info("headers:{}",request.getHeaderNames().nextElement());
+		String deviceId = request.getHeader(PARAMTER_DIVICEID_NAME);
+		String tokenOld = request.getHeader(PARAMTER_TOKEN_NAME);
+		//验证token
+		if(StringUtils.isNotBlank(tokenOld)){
+			try {
+				if(this.tokenService.checkToken(deviceId, tokenOld)){
+					result.setData(tokenOld);
+					result.setCode(ApiCodeEnum.SUCCESS);
+					return result;
+				}
+			} catch (TokenException e) {
+				LOGGER.error("验证Token错误:{}",e.getEc());
+				result.setCode(ApiCodeEnum.SERVICE_WRONG);
+				return result;
+			}
 		}
-		if(request.getParameterNames().hasMoreElements()) {
-			LOGGER.info("param:{}",request.getParameterNames().nextElement());
-		}
-		LOGGER.info("url:{}",request.getRequestURL());
+		//验证用户名密码
 		if("admin@saber.org".equals(username)&&"123456".equals(password)) {
-			String deviceId = request.getHeader(PARAMTER_DIVICEID_NAME);
+			
 			try {
 				String token = tokenService.insertToken(deviceId, username);
 				result.setData(token);
