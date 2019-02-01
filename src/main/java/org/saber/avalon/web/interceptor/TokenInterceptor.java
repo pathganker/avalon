@@ -17,8 +17,7 @@ import org.saber.avalon.service.api.ITokenService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+import org.springframework.web.servlet.HandlerInterceptor;
 
 import com.alibaba.fastjson.JSON;
 
@@ -30,8 +29,7 @@ import com.alibaba.fastjson.JSON;
  * @date:   2018年10月25日 下午6:03:18   
  *     
  */
-@Component
-public class TokenInterceptor extends HandlerInterceptorAdapter{
+public class TokenInterceptor implements HandlerInterceptor{
 	
 	/** 日志打印*/
 	private static final Logger	LOGGER = LoggerFactory.getLogger(TokenInterceptor.class);
@@ -59,13 +57,11 @@ public class TokenInterceptor extends HandlerInterceptorAdapter{
 					}else {
 						rt.setCode(ApiCodeEnum.TOKEN_TIME_OUT);//时间戳问题
 						handlerReturnJSON(response,rt);
-						LOGGER.info("token验证错误:{}",JSON.toJSONString(rt));
 						return false;
 					}
 				} catch (TokenException e) {
 					rt.setCode(e.getEc());//参数问题
 					handlerReturnJSON(response,rt);
-					LOGGER.info("token验证异常:{}",JSON.toJSONString(rt),e);
 					return false;
 				}
 			}else if (StringUtils.isBlank(token)) {
@@ -103,7 +99,7 @@ public class TokenInterceptor extends HandlerInterceptorAdapter{
 			out = response.getWriter();
 			out.append(JSON.toJSONString(rt));
 		} catch (IOException e) {
-			LOGGER.info("返回登录验证失败异常", e);		
+			LOGGER.info("返回登录验证失败异常:{}", e);		
 		} finally {
 			if (out != null) {
 				out.close();

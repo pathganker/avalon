@@ -1,0 +1,6 @@
+spring:
+  profiles:
+    active:redis,datasource
+server:
+  servlet:
+    context-path: /api

@@ -1,0 +1,52 @@
+spring:
+  datasource:
+    def:
+      druid:
+        driverClassName: com.mysql.jdbc.Driver
+        url: jdbc:mysql://127.0.0.1:3306/platform?useSSL=false&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;serverTimezone=UTC
+        username: root
+        password: root1010@mysql
+        filters: stat,wall,config
+        maxActive: 100
+        initialAize: 1
+        maxWait: 60000
+        minIdle: 1
+        timeBetweenLogStatsMillis: 60000
+        minEvictableIdleTimeMillis: 300000
+        validationQuery : select 1
+        testWhileIdle: true
+        testOBorrow: false
+    craw:
+      druid:
+        driverClassName: com.mysql.jdbc.Driver
+        url: jdbc:mysql://127.0.0.1:3306/prototype?useSSL=false&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;serverTimezone=UTC
+        username: root
+        password: root1010@mysql
+        filters: stat,wall,config
+        maxActive: 100
+        initialAize: 1
+        maxWait: 60000
+        minIdle: 1
+        timeBetweenLogStatsMillis: 60000
+        minEvictableIdleTimeMillis: 300000
+        validationQuery : select 1
+        testWhileIdle: true
+        testOBorrow: false
+  redis:
+    database: 0
+    host: 192.168.246.128
+    port: 6379
+    password: redis@1010
+    timeout: 1000
+    jedis:
+      pool:
+        max-active: 8
+        max-idle: 8
+        max-wait: -1
+        min-idle:  0
+  
+
+        
+        
+          
+      

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/2002/xmlspec/dtd/2.10/xmlspec.dtd">
+<configuration>
+    <contextName>$${logback.context}</contextName>
+    <!-- 日志输出格式 -->
+    <property name="encoding" value="UTF-8" />
+    <property name="normal-pattern" value="%date %level [%thread] %logger [%file : %line] %msg%n" />
+    <property name="plain-pattern" value="%d{yyyy-MM-dd.HH:mm:ss} %msg%n" />
+    
+    <!-- console appender, use to debug -->
+    <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${normal-pattern}</pattern>
+            <charset>${encoding}</charset>
+        </encoder>
+    </appender>
+    
+    <!-- log file default -->
+    <appender name="fileDefault" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <prudent>true</prudent>
+        <Append>true</Append>
+        <encoder>
+            <pattern>${normal-pattern}</pattern>
+            <charset>${encoding}</charset>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>/ROOT/logs/saber/avalon.log.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+    </appender>
+  
+    <logger name="org" level="INFO" />
+    <logger name="io.lettuce" level="ERROR" />
+    <logger name="io.netty" level="ERROR" />
+    <logger name="com.zaxxer" level="ERROR" />
+    <logger name="com.alibaba.druid" level="WARN" />
+    <root level="${logback.defaultlevel}">
+        <appender-ref ref="fileDefault"/>
+        <appender-ref ref="stdout"/>
+    </root>
+</configuration>

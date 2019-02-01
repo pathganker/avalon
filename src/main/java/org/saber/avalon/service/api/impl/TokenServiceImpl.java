@@ -18,13 +18,9 @@ import org.springframework.stereotype.Service;
 
 
 
-
-
-
-
 /**   
  * @ClassName:  TokenServiceImpl   
- * @Description:TODO
+ * @Description: token服务实现
  * @author: lijunliang 
  * @date:   2019年1月21日 下午11:25:09   
  *     
