@@ -40,6 +40,8 @@ public class TokenInterceptor implements HandlerInterceptor{
 	/** DIVICEID标记名*/
 	private static final String PARAMTER_DIVICEID_NAME = "Auth-Device";
 	
+	private static final String OPTIONS = "OPTIONS";
+	
 	/** TOKEN验证服务*/
 	@Autowired
 	private ITokenService tokenService;
@@ -47,6 +49,9 @@ public class TokenInterceptor implements HandlerInterceptor{
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler){
 		Result rt= new Result();
+		if(OPTIONS.equals(request.getMethod())) {
+			return false;
+		}
 		try {
 			String token = request.getHeader(PARAMTER_TOKEN_NAME);
 			String diviceId=request.getHeader(PARAMTER_DIVICEID_NAME);

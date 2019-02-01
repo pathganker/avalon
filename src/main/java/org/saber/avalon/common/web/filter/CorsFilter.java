@@ -53,7 +53,7 @@ public class CorsFilter implements Filter{
 			throws IOException, ServletException {
 		HttpServletResponse res = (HttpServletResponse) response;
         //response.reset(); 
-        res.addHeader("Access-Control-Allow-Origin", "*");
+        res.addHeader("Access-Control-Allow-Origin", "http://localhost:9001");
         res.addHeader("Access-Control-Allow-Methods", "GET, HEAD, POST, PUT, PATCH, DELETE, OPTIONS, TRACES");
         res.addHeader("Access-Control-Max-Age", "3600");
         res.addHeader("Access-Control-Allow-Headers", "Auth-Token, Auth-Device");
