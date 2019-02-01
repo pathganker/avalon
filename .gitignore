@@ -27,3 +27,13 @@ hs_err_pid*
 *.classpath
 *.project
 *.factorypath
+
+frontend-vue/.DS_Store
+frontend-vue/node_modules/
+frontend-vue/dist/
+frontend-vue/npm-debug.log
+frontend-vue/selenium-debug.log
+frontend-vue/.idea
+frontend-vue/package-lock.json
+frontend-vue/.eslintrc.js
+frontend-vue/.eslintignore
