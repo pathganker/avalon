@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.saber.avalon.modules.system.pojo;
+package org.saber.avalon.modules.system.pojo.dos;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -99,6 +99,18 @@ public class UserDO implements Serializable{
 	}
 	public void setModifyTime(Date modifyTime) {
 		this.modifyTime = modifyTime;
+	}
+	/**   
+	 * @Title getCredentialsSalt   
+	 * @Description TODO
+	 * @author lijunliang 
+	 * @date   2019年2月2日 下午4:08:58   
+	 * @param @return      
+	 * @return byte []      
+	 * @throws   
+	 */
+	public String getCredentialsSalt() {
+		return this.id+this.salt;
 	}
 	
 }

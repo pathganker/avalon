@@ -17,7 +17,7 @@
 	<properties>
 		<java.version>1.8</java.version>
 	</properties>
-    
+<!--     spring boot -->
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -27,13 +27,21 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-		
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
+<!-- 	druid	 -->
 		<dependency>
 		    <groupId>com.alibaba</groupId>
 		    <artifactId>druid</artifactId>
@@ -43,7 +51,7 @@
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
         </dependency>
-        
+<!--     mybatis     -->
         <dependency>
 		    <groupId>org.mybatis</groupId>
 		    <artifactId>mybatis</artifactId>
@@ -54,6 +62,7 @@
 		    <artifactId>mybatis-spring</artifactId>
 		    <version>2.0.0</version>
 		</dependency>
+<!-- 		fastjson -->
         <dependency>
 		    <groupId>com.alibaba</groupId>
 		    <artifactId>fastjson</artifactId>
@@ -63,26 +72,15 @@
 		    <groupId>org.apache.commons</groupId>
 		    <artifactId>commons-lang3</artifactId>
 	    </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-redis</artifactId>
-        </dependency>
-	    <dependency>
-	        <groupId>com.alibaba</groupId>
-	        <artifactId>fastjson</artifactId>
-	        <version>1.2.46</version>
-	    </dependency>
-	    <dependency>
-	    	<groupId>org.springframework.boot</groupId>
-	    	<artifactId>spring-boot-configuration-processor</artifactId>
-	    	<optional>true</optional>
-	    </dependency>
-	    <dependency>
-	    	<groupId>org.springframework.boot</groupId>
-	    	<artifactId>spring-boot-configuration-processor</artifactId>
-	    	<optional>true</optional>
-	    </dependency>
+<!-- 	    shiro -->
+		<dependency>
+		    <groupId>org.apache.shiro</groupId>
+		    <artifactId>shiro-spring</artifactId>
+		    <version>1.4.0</version>
+		</dependency>
 	</dependencies>
+	
+<!-- 	多环境配置 -->
     <profiles>
         <!--本地开发环境-->
         <profile>

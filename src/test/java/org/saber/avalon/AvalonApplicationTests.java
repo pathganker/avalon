@@ -5,7 +5,7 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.saber.avalon.modules.system.dao.UserDao;
-import org.saber.avalon.modules.system.pojo.UserDO;
+import org.saber.avalon.modules.system.pojo.dos.UserDO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;

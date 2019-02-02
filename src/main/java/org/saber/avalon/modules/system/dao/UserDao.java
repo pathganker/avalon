@@ -5,7 +5,8 @@ package org.saber.avalon.modules.system.dao;
 
 import java.util.List;
 
-import org.saber.avalon.modules.system.pojo.UserDO;
+import org.saber.avalon.modules.system.pojo.dos.UserDO;
+
 
 /**   
  * @ClassName:  UserDao   
