@@ -9,8 +9,8 @@ const service = axios.create({
   timeout: 5000,                  // 请求超时时间
   headers:{
     "Auth-Device":'001',
-    "Auth-Token":'default',
-  }
+    "Auth-Token":'14211777000084152948490109770045',
+  },
 });
 
 // request拦截器

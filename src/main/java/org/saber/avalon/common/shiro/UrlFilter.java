@@ -13,7 +13,7 @@ import org.apache.shiro.web.util.WebUtils;
 import org.saber.avalon.common.pojo.Result;
 import org.saber.avalon.common.pojo.api.ApiCodeEnum;
 import org.saber.avalon.common.utils.HandlerUtils;
-import org.saber.avalon.modules.system.service.UserService;
+import org.saber.avalon.modules.system.service.IUserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +35,7 @@ public class UrlFilter extends AccessControlFilter {
 	private final Logger logger = LoggerFactory.getLogger(UrlFilter.class);
 	
 	/** 用户管理 */
-	private UserService userService;
+	private IUserService userService;
 	
 	/**
 	 * 
@@ -62,7 +62,7 @@ public class UrlFilter extends AccessControlFilter {
             	Result rt = new Result();
             	rt.setCode(ApiCodeEnum.API_AUTHORITY);
             	HandlerUtils.handlerReturnJSON(response, rt);
-                 return false;
+                return false;
 			} else {
 				return true;
 			}
@@ -71,11 +71,17 @@ public class UrlFilter extends AccessControlFilter {
 	}
 	
 	/**
-	 * url权限检查
-	 * @param urls		有权限的url
-	 * @param request	请求request
-	 * @return
-	 * @throws IOException 
+	 * 
+	 * @Title checkPermission   
+	 * @Description TODO
+	 * @author lijunliang 
+	 * @date   2019年2月12日 上午12:04:07   
+	 * @param @param urls
+	 * @param @param request
+	 * @param @return
+	 * @param @throws IOException      
+	 * @return boolean      
+	 * @throws
 	 */
 	private boolean checkPermission(Set<String> urls, ServletRequest request) throws IOException {
 	    // 判断首页
@@ -115,7 +121,7 @@ public class UrlFilter extends AccessControlFilter {
 	/**
 	 * @param userService the userService to set
 	 */
-	public void setUserService(UserService userService) {
+	public void setUserService(IUserService userService) {
 		this.userService = userService;
 	}
 	

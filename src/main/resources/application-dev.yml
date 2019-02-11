@@ -5,7 +5,7 @@ spring:
         driverClassName: com.mysql.jdbc.Driver
         url: jdbc:mysql://127.0.0.1:3306/platform?useSSL=false&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;serverTimezone=UTC
         username: root
-        password: 123456
+        password: root1010@mysql
         filters: stat,wall,config
         maxActive: 100
         initialAize: 1
@@ -21,7 +21,7 @@ spring:
         driverClassName: com.mysql.jdbc.Driver
         url: jdbc:mysql://127.0.0.1:3306/prototype?useSSL=false&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;serverTimezone=UTC
         username: root
-        password: 123456
+        password: root1010@mysql
         filters: stat,wall,config
         maxActive: 100
         initialAize: 1

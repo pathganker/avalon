@@ -3,8 +3,9 @@
 
 /* 是否是公司邮箱*/
 export function isWscnusername(str) {
-  const reg = /^[a-z0-9](?:[-_.+]?[a-z0-9]+)*@saber\.org$/i;
-  return reg.test(str.trim());
+  // const reg = /^[a-z0-9](?:[-_.+]?[a-z0-9]+)*@saber\.org$/i;
+  // return reg.test(str.trim());
+  return true;
 }
 
 /* 合法uri*/

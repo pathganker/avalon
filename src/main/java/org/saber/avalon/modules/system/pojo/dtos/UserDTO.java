@@ -23,9 +23,9 @@ public class UserDTO implements Serializable{
 	/** 员工ID */
 	private String id;
 	/** 登录名*/
-	private String name;
+	private String username;
 	/** 用户名*/
-	private String nickName;
+	private String nickname;
 	/** 密码 */
 	private String password;
 	/** 盐值 */
@@ -46,17 +46,17 @@ public class UserDTO implements Serializable{
 	public void setId(String id) {
 		this.id = id;
 	}
-	public String getName() {
-		return name;
+	public String getUsername() {
+		return username;
 	}
-	public void setName(String name) {
-		this.name = name;
+	public void setUsername(String username) {
+		this.username = username;
 	}
-	public String getNickName() {
-		return nickName;
+	public String getNickname() {
+		return nickname;
 	}
-	public void setNickName(String nickName) {
-		this.nickName = nickName;
+	public void setNickname(String nickname) {
+		this.nickname = nickname;
 	}
 	public String getPassword() {
 		return password;

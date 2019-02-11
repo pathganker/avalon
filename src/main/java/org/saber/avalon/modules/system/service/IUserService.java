@@ -14,7 +14,7 @@ import org.saber.avalon.modules.system.pojo.dtos.UserDTO;
  * @date  2019年2月2日 下午4:05:30   
  *     
  */
-public interface UserService {
+public interface IUserService {
 
 	/**   
 	 * @Title requestUserByName   

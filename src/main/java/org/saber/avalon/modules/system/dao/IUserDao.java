@@ -4,6 +4,7 @@
 package org.saber.avalon.modules.system.dao;
 
 import java.util.List;
+import java.util.Set;
 
 import org.saber.avalon.modules.system.pojo.dos.UserDO;
 
@@ -15,7 +16,7 @@ import org.saber.avalon.modules.system.pojo.dos.UserDO;
  * @date:   2019年2月2日 上午12:34:29   
  *     
  */
-public interface UserDao {
+public interface IUserDao {
 	
 	List<UserDO> getAll();
 	
@@ -26,4 +27,10 @@ public interface UserDao {
 	void update(UserDO user);
 	
 	void delete(String id);
+	
+	UserDO queryUserByName(String username);
+	
+	Set<String> queryPermiUrlsByName(String username);
+	
+	Set<String> queryRoleIdByName(String username);
 }

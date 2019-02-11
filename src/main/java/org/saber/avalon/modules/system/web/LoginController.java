@@ -5,16 +5,20 @@ package org.saber.avalon.modules.system.web;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.lang3.StringUtils;
-import org.saber.avalon.common.exception.api.TokenException;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.AuthenticationToken;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.session.SessionException;
+import org.apache.shiro.subject.Subject;
 import org.saber.avalon.common.pojo.Result;
 import org.saber.avalon.common.pojo.api.ApiCodeEnum;
-import org.saber.avalon.common.service.api.ITokenService;
+import org.saber.avalon.modules.system.utils.CustomWebUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 
 /**   
  * @ClassName:  LoginController   
@@ -28,12 +32,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class LoginController {
 	/** 日志 */
 	private final static  Logger LOGGER = LoggerFactory.getLogger(LoginController.class);
-	/** TOKEN标记名*/
-	private static final String PARAMTER_TOKEN_NAME = "Auth-Token";
-	/** DIVICEID标记名*/
-	private static final String PARAMTER_DIVICEID_NAME = "Auth-Device";
-	@Autowired
-	private ITokenService tokenService;
 	/**
 	 * 
 	 * @Title: login   
@@ -48,40 +46,20 @@ public class LoginController {
 	 * @throws
 	 */
 	@RequestMapping(value="/signin")
-	public Result login(HttpServletRequest request, String username, 
-			String password) {
+	public Result login(HttpServletRequest request, String username, String password) {
 		Result result = new Result();
-		String deviceId = request.getHeader(PARAMTER_DIVICEID_NAME);
-		String tokenOld = request.getHeader(PARAMTER_TOKEN_NAME);
-		//验证token
-		if(StringUtils.isNotBlank(tokenOld)){
-			try {
-				if(this.tokenService.checkToken(deviceId, tokenOld)){
-					result.setData(tokenOld);
-					result.setCode(ApiCodeEnum.SUCCESS);
-					return result;
-				}
-			} catch (TokenException e) {
-				LOGGER.error("验证Token错误:{}",e.getEc());
-				result.setCode(ApiCodeEnum.SERVICE_WRONG);
-				return result;
-			}
+		AuthenticationToken token = createToken(username, password, CustomWebUtils.getRemoteIpAddr(request));
+		try {
+			Subject subject = SecurityUtils.getSubject();
+            subject.login(token);
+            result.setCode(ApiCodeEnum.SUCCESS);
+            return result;
+		}catch (AuthenticationException e) {
+			LOGGER.info("登陆失败,对应的用户名为:{},{}",username,e);
+			//登录错误，回到登录页面
+			result.setCode(ApiCodeEnum.USER_NAME_OR_PWD);
+        	return result;
 		}
-		//验证用户名密码
-		if("admin@saber.org".equals(username)&&"123456".equals(password)) {
-			
-			try {
-				String token = tokenService.insertToken(deviceId, username);
-				result.setData(token);
-				result.setCode(ApiCodeEnum.SUCCESS);
-				return result;
-			} catch (TokenException e) {
-				LOGGER.error("创建Token错误:{}",e.getEc());
-			}
-			
-		}
-		result.setCode(ApiCodeEnum.USER_NAME_OR_PWD);
-		return result;
 	}
 	/**
 	 * 
@@ -95,15 +73,19 @@ public class LoginController {
 	 * @throws
 	 */
 	@RequestMapping(value="/signout")
-	public Result logout(HttpServletRequest request) {
+	public Result logout() {
 		Result rs = new Result();
-		String token = request.getHeader(PARAMTER_TOKEN_NAME);
-		try {
-			tokenService.deleteToken(token);
-		} catch (TokenException e) {
-			LOGGER.error("删除Token错误:{}",e.getEc());
-		}
+		Subject subject = SecurityUtils.getSubject();
+        try {
+            subject.logout();
+        } catch (SessionException ise) {
+        	LOGGER.debug("Encountered session exception during logout.  This can generally safely be ignored.", ise);
+        }
 		rs.setCode(ApiCodeEnum.SUCCESS);
 		return rs;
+	}
+	
+	private AuthenticationToken createToken(String username, String password, String host) {
+		return new UsernamePasswordToken(username, password, true, host);
 	}
 }

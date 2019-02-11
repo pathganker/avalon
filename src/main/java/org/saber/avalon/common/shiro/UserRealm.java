@@ -12,7 +12,7 @@ import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.util.ByteSource;
 import org.saber.avalon.modules.system.pojo.dtos.UserDTO;
-import org.saber.avalon.modules.system.service.UserService;
+import org.saber.avalon.modules.system.service.IUserService;
 
 
 /**
@@ -26,7 +26,7 @@ import org.saber.avalon.modules.system.service.UserService;
 public class UserRealm extends AuthorizingRealm {
 
 	/** 用户管理Service */
-    private UserService userService;
+    private IUserService userService;
 
     public UserRealm() {
     }
@@ -57,13 +57,13 @@ public class UserRealm extends AuthorizingRealm {
 
         UserDTO user = userService.requestUserByName(username);
 
-        if(user == null || StringUtils.isBlank(user.getName())) {
+        if(user == null || StringUtils.isBlank(user.getUsername())) {
             throw new UnknownAccountException();//没找到帐号
         }
 
         //交给AuthenticatingRealm使用CredentialsMatcher进行密码匹配，如果觉得人家的不好可以自定义实现
         SimpleAuthenticationInfo authenticationInfo = new SimpleAuthenticationInfo(
-        		user.getName(), //用户名
+        		user.getUsername(), //用户名
         		user.getPassword(), //密码
                 ByteSource.Util.bytes(user.getCredentialsSalt()),//salt=username+salt
                 getName()  //realm name
@@ -99,7 +99,7 @@ public class UserRealm extends AuthorizingRealm {
         clearAllCachedAuthorizationInfo();
     }
     
-    public void setUserService(UserService userService) {
+    public void setUserService(IUserService userService) {
         this.userService = userService;
     }
 

@@ -7,7 +7,7 @@ import java.util.List;
 
 import org.saber.avalon.common.pojo.Result;
 import org.saber.avalon.common.pojo.api.ApiCodeEnum;
-import org.saber.avalon.modules.system.dao.UserDao;
+import org.saber.avalon.modules.system.dao.IUserDao;
 import org.saber.avalon.modules.system.pojo.dos.UserDO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
 	
 	@Autowired
-	private UserDao userDao;
+	private IUserDao userDao;
 	
 	/**
 	 * 
