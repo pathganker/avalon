@@ -1,25 +1,26 @@
 package org.saber.avalon.common.shiro;
 
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.Deque;
 import java.util.LinkedList;
-import java.util.concurrent.ConcurrentHashMap;
-
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-
 import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.CacheManager;
-import org.apache.shiro.cache.MapCache;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.UnknownSessionException;
 import org.apache.shiro.session.mgt.DefaultSessionKey;
 import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.filter.AccessControlFilter;
-import org.apache.shiro.web.util.WebUtils;
+import org.saber.avalon.common.pojo.Result;
+import org.saber.avalon.common.pojo.api.ApiCodeEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.alibaba.fastjson.JSON;
 
 /**
  * 
@@ -33,17 +34,14 @@ public class KickoutSessionControlFilter extends AccessControlFilter {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(KickoutSessionControlFilter.class);
 
-	/** 踢出后到的地址 */
-	private String kickoutUrl;
 	/** 踢出之前登录的/之后登录的用户 默认踢出之前登录的用户 */
 	private boolean kickoutAfter = false;
 	/** 同一个帐号最大会话数 默认1 */
-	private int maxSession = 10;
-
+	private int maxSession = 1;
+	/** session管理 */
 	private SessionManager sessionManager;
-	/** 默认使用内存map做cache TODO 这样做不支持集群，考虑redis */
-	private Cache<String, Deque<Serializable>> cache = new MapCache<String, Deque<Serializable>>("shiro-kickout-session", new ConcurrentHashMap<String, Deque<Serializable>>());;
-
+	/** redis缓存管理 */
+	private CacheManager cacheManager;
 	/**
 	 * 
 	 */
@@ -79,19 +77,17 @@ public class KickoutSessionControlFilter extends AccessControlFilter {
 		Session session = subject.getSession();
 		String username = (String) subject.getPrincipal();
 		Serializable sessionId = session.getId();
-
+		Cache<String, Deque<Serializable>> cache = cacheManager.getCache("shiro-kickout-session");
 		Deque<Serializable> deque = cache.get(username);
 		if (deque == null) {
 			deque = new LinkedList<Serializable>();
 			cache.put(username, deque);
 		}
-
 		// 如果队列里没有此sessionId，且用户没有被踢出；放入队列
 		if (!deque.contains(sessionId)
 				&& session.getAttribute("kickout") == null) {
 			deque.push(sessionId);
 		}
-
 		// 如果队列里的sessionId数超出最大会话数，开始踢人
 		while (deque.size() > maxSession) {
 			Serializable kickoutSessionId = null;
@@ -113,39 +109,48 @@ public class KickoutSessionControlFilter extends AccessControlFilter {
 				LOGGER.info("并发登陆控制出现错误",e);
 			}
 		}
-
 		// 如果被踢出了，直接退出，重定向到踢出后的地址
 		if (session.getAttribute("kickout") != null) {
+			Result rt = new Result();
 			// 会话被踢出了
-//			try {
-//				subject.logout();
-//			} catch (Exception e) { // ignore
-//				LOGGER.info("并发登陆控制出现错误",e);
-//			}
-			
+			try {
+				subject.logout();
+				rt.setCode(ApiCodeEnum.CHANGE_DEVICE);
+			} catch (Exception e) { // ignore
+				LOGGER.info("并发登陆控制出现错误",e);
+				rt.setCode(ApiCodeEnum.SERVICE_WRONG);
+			}
 			saveRequest(request);
-			WebUtils.issueRedirect(request, response, kickoutUrl);
+			handlerReturnJSON(response,rt);
 			return false;
 		}
-
 		return true;
 	}
+	
+	private void handlerReturnJSON(ServletResponse response, Result rt) {
+		response.setContentType("application/json; charset=utf-8");
+		PrintWriter out = null;
+		try {
+			out = response.getWriter();
+			out.append(JSON.toJSONString(rt));
+		} catch (IOException e) {
+			LOGGER.info("返回登录验证失败异常:{}", e);		
+		} finally {
+			if (out != null) {
+				out.close();
+			}
+		}
 
+	}
+	
 	/**
 	 * 使用cacheManager获取缓存对象
 	 * @param cacheManager
 	 */
 	public void setCacheManager(CacheManager cacheManager) {
-        this.cache = cacheManager.getCache("shiro-kickout-session");
+        this.cacheManager = cacheManager;
     }
 	
-	/**
-	 * @param kickoutUrl
-	 *            the kickoutUrl to set
-	 */
-	public void setKickoutUrl(String kickoutUrl) {
-		this.kickoutUrl = kickoutUrl;
-	}
 
 	/**
 	 * @param kickoutAfter
@@ -170,13 +175,4 @@ public class KickoutSessionControlFilter extends AccessControlFilter {
 	public void setSessionManager(SessionManager sessionManager) {
 		this.sessionManager = sessionManager;
 	}
-
-	/**
-	 * @param cache
-	 *            the cache to set
-	 */
-	public void setCache(Cache<String, Deque<Serializable>> cache) {
-		this.cache = cache;
-	}
-	
 }

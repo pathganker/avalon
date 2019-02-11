@@ -37,3 +37,6 @@ frontend-vue/.idea
 frontend-vue/package-lock.json
 frontend-vue/.eslintrc.js
 frontend-vue/.eslintignore
+
+/.vscode
+/.apt_generated/

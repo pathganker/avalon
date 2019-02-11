@@ -10,6 +10,9 @@ import javax.servlet.ServletResponse;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.filter.AccessControlFilter;
 import org.apache.shiro.web.util.WebUtils;
+import org.saber.avalon.common.pojo.Result;
+import org.saber.avalon.common.pojo.api.ApiCodeEnum;
+import org.saber.avalon.common.utils.HandlerUtils;
 import org.saber.avalon.modules.system.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,10 +21,10 @@ import org.slf4j.LoggerFactory;
 
 /**
  * 
- * @ClassName:  UrlFilter   
- * @Description:TODO
- * @author: lijunliang 
- * @date:   2018年11月1日 上午10:12:24   
+ * @ClassName  UrlFilter   
+ * @Description 资源路径过滤
+ * @author lijunliang 
+ * @date   2018年11月1日 上午10:12:24   
  *
  */
 public class UrlFilter extends AccessControlFilter {
@@ -33,9 +36,6 @@ public class UrlFilter extends AccessControlFilter {
 	
 	/** 用户管理 */
 	private UserService userService;
-	
-	/** 拒绝后跳转的url */
-	private String redirectUrl;
 	
 	/**
 	 * 
@@ -59,7 +59,9 @@ public class UrlFilter extends AccessControlFilter {
             }
             boolean hasPermission = urls == null ? false : checkPermission(urls, request);
             if (!hasPermission) {
-            	 WebUtils.issueRedirect(request, response, redirectUrl);
+            	Result rt = new Result();
+            	rt.setCode(ApiCodeEnum.API_AUTHORITY);
+            	HandlerUtils.handlerReturnJSON(response, rt);
                  return false;
 			} else {
 				return true;
@@ -97,9 +99,6 @@ public class UrlFilter extends AccessControlFilter {
 				return true;
 			}
 		}
-    	
-    	
-    	
     	return false;
 	}
 
@@ -111,13 +110,6 @@ public class UrlFilter extends AccessControlFilter {
 			ServletResponse response) throws Exception {
 		logger.trace("access denied, user:{},uri:{}", getSubject(request, response).getPrincipal(), getPathWithinApplication(request));
 		return false;
-	}
-
-	/**
-	 * @param redirectUrl the redirectUrl to set
-	 */
-	public void setRedirectUrl(String redirectUrl) {
-		this.redirectUrl = redirectUrl;
 	}
 
 	/**

@@ -5,57 +5,151 @@ package org.saber.avalon.common.config;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Properties;
 
+import javax.servlet.Filter;
+
+import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
+import org.apache.shiro.web.filter.authc.AnonymousFilter;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
+import org.apache.shiro.web.servlet.SimpleCookie;
+import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
+import org.crazycake.shiro.RedisCacheManager;
+import org.crazycake.shiro.RedisManager;
+import org.crazycake.shiro.RedisSessionDAO;
+import org.saber.avalon.common.shiro.KickoutSessionControlFilter;
+import org.saber.avalon.common.shiro.UrlFilter;
 import org.saber.avalon.common.shiro.UserRealm;
+import org.saber.avalon.modules.system.service.impl.UserServiceImpl;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**   
  * @ClassName  ShiroConfig   
- * @Description	TODO
+ * @Description	shiro配置
  * @author lijunliang 
  * @date  2019年2月2日 下午3:46:44   
  *     
  */
 @Configuration
 public class ShiroConfig {
-	@Bean
-	public ShiroFilterFactoryBean shirFilter() {
-		ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();
-		shiroFilterFactoryBean.setSecurityManager(securityManager());
-		//拦截器.
-		Map<String,String> filterChainDefinitionMap = new LinkedHashMap<String,String>();
-		// 配置不会被拦截的链接 顺序判断
-		filterChainDefinitionMap.put("/static/**", "anon");
-		//配置退出 过滤器,其中的具体的退出代码Shiro已经替我们实现了
-		filterChainDefinitionMap.put("/logout", "logout");
-		//<!-- 过滤链定义，从上向下顺序执行，一般将/**放在最为下边 -->:这是一个坑呢，一不小心代码就不好使了;
-		//<!-- authc:所有url都必须认证通过才可以访问; anon:所有url都都可以匿名访问-->
-		filterChainDefinitionMap.put("/**", "authc");
-		// 如果不设置默认会自动寻找Web工程根目录下的"/login.jsp"页面
-		shiroFilterFactoryBean.setLoginUrl("/login");
-		// 登录成功后要跳转的链接
-		shiroFilterFactoryBean.setSuccessUrl("/index");
-
-		//未授权界面;
-		shiroFilterFactoryBean.setUnauthorizedUrl("/403");
-		shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);
-		return shiroFilterFactoryBean;
+	
+	//凭证管理
+	public HashedCredentialsMatcher credentialsMatcher(){
+		HashedCredentialsMatcher credentialsMatcher = new HashedCredentialsMatcher();
+		credentialsMatcher.setHashAlgorithmName("md5");
+		credentialsMatcher.setHashIterations(2);
+		credentialsMatcher.setStoredCredentialsHexEncoded(true);
+		return credentialsMatcher;
 	}
-
-	@Bean
+	//用户服务
+	public UserServiceImpl userService(){
+		return new UserServiceImpl();
+	}
+	//realm
 	public UserRealm userRealm(){
 		UserRealm userRealm = new UserRealm();
+		userRealm.setUserService(userService());
+		userRealm.setCredentialsMatcher(credentialsMatcher());
+		userRealm.setCachingEnabled(true);
+		userRealm.setCacheManager(cacheManager());
+		userRealm.setAuthenticationCachingEnabled(true);
+		userRealm.setAuthenticationCacheName("authenticationCache");
 		return userRealm;
 	}
-
+	//读取redis配置
 	@Bean
+	@ConfigurationProperties(prefix="spring.redis")
+	public Properties redisProperties() {
+		return new Properties()	;
+	}
+	//redis管理
+	public RedisManager redisManager(){
+		RedisManager redisManager = new RedisManager();
+		redisManager.setHost(redisProperties().getProperty("host")+":"+redisProperties().getProperty("port"));
+		redisManager.setPassword(redisProperties().getProperty("password"));
+		redisManager.setTimeout(Integer.parseInt(redisProperties().getProperty("timeout")));
+		redisManager.setDatabase(Integer.parseInt(redisProperties().getProperty("database")));
+		return redisManager;
+	}
+	//session dao
+	public RedisSessionDAO sessionDao(){
+		RedisSessionDAO sessionDao = new RedisSessionDAO();
+		sessionDao.setRedisManager(redisManager());
+		return sessionDao;
+	}
+	//cookie
+	public SimpleCookie sessionIdCookie(){
+		SimpleCookie sessionIdCookie = new SimpleCookie();
+		sessionIdCookie.setName("sid");
+		sessionIdCookie.setHttpOnly(true);
+		sessionIdCookie.setMaxAge(180000);
+		return sessionIdCookie;
+	}
+	//redis缓存
+	public RedisCacheManager cacheManager(){
+		RedisCacheManager cacheManager = new RedisCacheManager();
+		cacheManager.setRedisManager(redisManager());
+		return cacheManager;
+	}
+	//session管理
+	public DefaultWebSessionManager sessionManager(){
+		DefaultWebSessionManager sessionManager = new DefaultWebSessionManager();
+		sessionManager.setSessionDAO(sessionDao());
+		sessionManager.setGlobalSessionTimeout(3600*1000*24);
+		sessionManager.setDeleteInvalidSessions(true);
+		sessionManager.setSessionValidationSchedulerEnabled(true);
+		sessionManager.setSessionIdCookieEnabled(true);
+		sessionManager.setSessionIdCookie(sessionIdCookie());
+		return sessionManager;
+	}
+	//安全管理
 	public SecurityManager securityManager(){
 		DefaultWebSecurityManager securityManager =  new DefaultWebSecurityManager();
 		securityManager.setRealm(userRealm());
+		securityManager.setSessionManager(sessionManager());
+		securityManager.setCacheManager(cacheManager());
 		return securityManager;
 	}
+	
+	//并发登录人数控制 
+	public KickoutSessionControlFilter kickoutFilter(){
+		KickoutSessionControlFilter kickoutFilter = new KickoutSessionControlFilter();
+		kickoutFilter.setSessionManager(sessionManager());
+		kickoutFilter.setKickoutAfter(false);
+		kickoutFilter.setMaxSession(1);
+		kickoutFilter.setCacheManager(cacheManager());
+		return kickoutFilter;
+	}
+	
+	//URL权限验证
+	public UrlFilter urlFilter(){
+		UrlFilter urlFilter = new UrlFilter();
+		urlFilter.setUserService(userService());
+		return urlFilter;
+	}
+	//匿名权限
+	public AnonymousFilter anon(){
+		return new AnonymousFilter(); 
+	}
+	//web过滤器
+	@Bean
+	public ShiroFilterFactoryBean shiroFilter() {
+		ShiroFilterFactoryBean shiroFilter = new ShiroFilterFactoryBean();
+		shiroFilter.setSecurityManager(securityManager());
+		Map<String, Filter> filterMap = new LinkedHashMap<String, Filter>();
+		filterMap.put("kickout", kickoutFilter());
+		filterMap.put("url", urlFilter());
+		filterMap.put("anon", anon());
+		shiroFilter.setFilters(filterMap);
+		Map<String, String> filterChainDefinitionMap = new LinkedHashMap<String, String>();
+		filterChainDefinitionMap.put("/login/**", "anon");
+		filterChainDefinitionMap.put("/**", "url,kickout");
+		shiroFilter.setFilterChainDefinitionMap(filterChainDefinitionMap);
+		return shiroFilter;
+	}
+	
 }

@@ -17,7 +17,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * @date:   2019年1月28日 下午6:50:04   
  *     
  */
-@Configuration
+//@Configuration
 public class CustomMvcConfig implements WebMvcConfigurer{
 	
 	@Bean
@@ -27,7 +27,7 @@ public class CustomMvcConfig implements WebMvcConfigurer{
 	
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
-		registry.addInterceptor(tokenInterceptor()).addPathPatterns("/**").excludePathPatterns("/login/**");
+//		registry.addInterceptor(tokenInterceptor()).addPathPatterns("/**").excludePathPatterns("/login/**");
 	}
 	
 }

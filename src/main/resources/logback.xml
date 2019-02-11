@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/2002/xmlspec/dtd/2.10/xmlspec.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "dtd/xmlspec.dtd">
 <configuration>
     <contextName>$${logback.context}</contextName>
-    <!-- 日志输出格式 -->
     <property name="encoding" value="UTF-8" />
     <property name="normal-pattern" value="%date %level [%thread] %logger [%file : %line] %msg%n" />
     <property name="plain-pattern" value="%d{yyyy-MM-dd.HH:mm:ss} %msg%n" />
     
-    <!-- console appender, use to debug -->
     <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>${normal-pattern}</pattern>
@@ -15,7 +13,6 @@
         </encoder>
     </appender>
     
-    <!-- log file default -->
     <appender name="fileDefault" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <prudent>true</prudent>
         <Append>true</Append>
