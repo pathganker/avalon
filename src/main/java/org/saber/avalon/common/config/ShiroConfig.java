@@ -24,10 +24,12 @@ import org.saber.avalon.common.shiro.KickoutSessionControlFilter;
 import org.saber.avalon.common.shiro.TokenFilter;
 import org.saber.avalon.common.shiro.UrlFilter;
 import org.saber.avalon.common.shiro.UserRealm;
+import org.saber.avalon.common.shiro.serializer.FastJsonRedisSerializer;
 import org.saber.avalon.modules.system.service.impl.UserServiceImpl;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
 
 /**   
  * @ClassName  ShiroConfig   
@@ -48,6 +50,7 @@ public class ShiroConfig {
 		return credentialsMatcher;
 	}
 	//用户服务
+	@Bean
 	public UserServiceImpl userService(){
 		return new UserServiceImpl();
 	}
@@ -57,11 +60,40 @@ public class ShiroConfig {
 		userRealm.setUserService(userService());
 		userRealm.setCredentialsMatcher(credentialsMatcher());
 		userRealm.setCachingEnabled(true);
-		userRealm.setCacheManager(cacheManager());
+		userRealm.setRedisCacheManager(cacheManager());
 		userRealm.setAuthenticationCachingEnabled(true);
 		userRealm.setAuthenticationCacheName("authenticationCache");
 		return userRealm;
 	}
+
+	
+//	@Bean
+//	public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory){
+//		RedisTemplate<String, Object> redisTemplate = new RedisTemplate<String, Object>();
+//		redisTemplate.setConnectionFactory(connectionFactory);
+//		redisTemplate.setKeySerializer(keySerializer());
+//		redisTemplate.setValueSerializer(valueSerializer());
+//		redisTemplate.setHashValueSerializer(valueSerializer());
+//		return redisTemplate;
+//	}
+//	private RedisSerializer<String> keySerializer(){
+//		return new StringRedisSerializer();
+//	}
+//	private RedisSerializer<Object> valueSerializer(){
+//		return new FastJsonRedisSerializer<Object>(Object.class);
+//	}
+//	
+//	@Bean
+//	public CacheManager redisManger(RedisConnectionFactory connectionFactory){
+//		RedisCacheConfiguration redisCacheConfiguration = RedisCacheConfiguration.defaultCacheConfig();
+//		redisCacheConfiguration = redisCacheConfiguration.entryTtl(Duration.ofMinutes(30L))
+//				.disableCachingNullValues()
+//				.serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(null))
+//				.serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(null));
+//		return RedisCacheManager.builder(RedisCacheWriter.nonLockingRedisCacheWriter(connectionFactory))
+//				.cacheDefaults(redisCacheConfiguration).build();
+//	}
+	/*shiro-redis */
 	//读取redis配置
 	@Bean
 	@ConfigurationProperties(prefix="spring.redis")
@@ -83,6 +115,12 @@ public class ShiroConfig {
 		sessionDao.setRedisManager(redisManager());
 		return sessionDao;
 	}
+	//redis缓存
+	public  RedisCacheManager cacheManager(){
+		RedisCacheManager cacheManager = new RedisCacheManager();
+		cacheManager.setRedisManager(redisManager());
+		return cacheManager;
+	}
 	//cookie
 	public SimpleCookie sessionIdCookie(){
 		SimpleCookie sessionIdCookie = new SimpleCookie();
@@ -90,12 +128,6 @@ public class ShiroConfig {
 		sessionIdCookie.setHttpOnly(true);
 		sessionIdCookie.setMaxAge(180000);
 		return sessionIdCookie;
-	}
-	//redis缓存
-	public RedisCacheManager cacheManager(){
-		RedisCacheManager cacheManager = new RedisCacheManager();
-		cacheManager.setRedisManager(redisManager());
-		return cacheManager;
 	}
 	//session管理
 	public DefaultWebSessionManager sessionManager(){
@@ -113,12 +145,12 @@ public class ShiroConfig {
 		DefaultWebSecurityManager securityManager =  new DefaultWebSecurityManager();
 		securityManager.setRealm(userRealm());
 		securityManager.setSessionManager(sessionManager());
-		securityManager.setCacheManager(cacheManager());
+		//securityManager.setCacheManager(cacheManager());
 		return securityManager;
 	}
 	
 	//并发登录人数控制 
-	public KickoutSessionControlFilter kickoutFilter(){
+	private KickoutSessionControlFilter kickoutFilter(){
 		KickoutSessionControlFilter kickoutFilter = new KickoutSessionControlFilter();
 		kickoutFilter.setSessionManager(sessionManager());
 		kickoutFilter.setKickoutAfter(false);
@@ -128,21 +160,21 @@ public class ShiroConfig {
 	}
 	
 	//URL权限验证
-	public UrlFilter urlFilter(){
+	private UrlFilter urlFilter(){
 		UrlFilter urlFilter = new UrlFilter();
 		urlFilter.setUserService(userService());
 		return urlFilter;
 	}
 	//匿名权限
-	public AnonymousFilter anon(){
+	private AnonymousFilter anon(){
 		return new AnonymousFilter(); 
 	}
 	
-	public TokenServiceImpl tokenService() {
+	private TokenServiceImpl tokenService() {
 		return new TokenServiceImpl();
 	}
 	//Token验证
-	public TokenFilter tokenFilter() {
+	private TokenFilter tokenFilter() {
 		TokenFilter tokenFilter = new TokenFilter();
 		tokenFilter.setTokenService(tokenService());
 		return tokenFilter;

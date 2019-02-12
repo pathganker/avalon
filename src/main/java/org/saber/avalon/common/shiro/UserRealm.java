@@ -8,9 +8,13 @@ import org.apache.shiro.authc.SimpleAuthenticationInfo;
 import org.apache.shiro.authc.UnknownAccountException;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
-import org.apache.shiro.realm.AuthorizingRealm;
+import org.apache.shiro.cache.Cache;
+import org.apache.shiro.cache.CacheManager;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.util.ByteSource;
+import org.crazycake.shiro.RedisCacheManager;
+import org.saber.avalon.common.shiro.realm.AuthorizingRealm;
+import org.saber.avalon.common.shiro.serializer.FastJsonRedisSerializer;
 import org.saber.avalon.modules.system.pojo.dtos.UserDTO;
 import org.saber.avalon.modules.system.service.IUserService;
 
@@ -27,14 +31,14 @@ public class UserRealm extends AuthorizingRealm {
 
 	/** 用户管理Service */
     private IUserService userService;
-
+    
     public UserRealm() {
     }
     
-    /*
-     * (non-Javadoc)
-     * @see org.apache.shiro.realm.AuthorizingRealm#doGetAuthorizationInfo(org.apache.shiro.subject.PrincipalCollection)
-     */
+	 /**
+	  * (non-Javadoc)
+	  * @see org.apache.shiro.realm.AuthorizingRealm#doGetAuthorizationInfo(org.apache.shiro.subject.PrincipalCollection)
+	  */
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
         String username = (String)principals.getPrimaryPrincipal();
@@ -46,10 +50,10 @@ public class UserRealm extends AuthorizingRealm {
         return authorizationInfo;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.apache.shiro.realm.AuthenticatingRealm#doGetAuthenticationInfo(org.apache.shiro.authc.AuthenticationToken)
-     */
+	/**
+	 * (non-Javadoc)
+	 * @see org.apache.shiro.realm.AuthenticatingRealm#doGetAuthenticationInfo(org.apache.shiro.authc.AuthenticationToken)
+	 */
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
 
@@ -70,7 +74,34 @@ public class UserRealm extends AuthorizingRealm {
         );
         return authenticationInfo;
     }
-
+    
+    
+    /**
+     * (non-Javadoc)
+     * @see org.apache.shiro.realm.AuthorizingRealm#getAuthorizationInfo(org.apache.shiro.subject.PrincipalCollection)
+     */
+    @Override
+    protected AuthorizationInfo getAuthorizationInfo(PrincipalCollection principals) {
+        if (principals == null) {
+            return null;
+        }
+        AuthorizationInfo info = null;
+        Cache<Object, AuthorizationInfo> cache = super.getAuthorizationCache();
+        if (cache != null) {
+            Object key = getAuthorizationCacheKey(principals);
+            info = cache.get(key);
+        }
+        if (info == null) {
+            // Call template method if the info was not found in a cache
+            info = doGetAuthorizationInfo(principals);
+            // If the info is not null and the cache has been created, then cache the authorization info.
+            if (info != null && cache != null) {
+                Object key = getAuthorizationCacheKey(principals);
+                cache.put(key, info);
+            }
+        }
+        return info;
+    }
     @Override
     public void clearCachedAuthorizationInfo(PrincipalCollection principals) {
         super.clearCachedAuthorizationInfo(principals);
@@ -102,5 +133,9 @@ public class UserRealm extends AuthorizingRealm {
     public void setUserService(IUserService userService) {
         this.userService = userService;
     }
-
+    
+    public void setRedisCacheManager(RedisCacheManager cacheManager){
+    	cacheManager.setValueSerializer(new FastJsonRedisSerializer<SimpleAuthenticationInfo>(SimpleAuthenticationInfo.class));
+    	this.setCacheManager(cacheManager);
+    }
 }

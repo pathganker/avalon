@@ -20,12 +20,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 
-/**   
- * @ClassName:  LoginController   
- * @Description:TODO
- * @author: lijunliang 
- * @date:   2019年1月20日 下午1:23:13   
- *     
+/**
+ * 
+ * <p>类名称: LoginController </p> 
+ * <p>描述: 登录控制器  </p>
+ * <p>创建时间 : 2019年2月12日 下午12:02:33 </p>
+ * @author lijunliang
+ * @version 1.0
+ *
  */
 @RestController
 @RequestMapping("login")
@@ -34,16 +36,16 @@ public class LoginController {
 	private final static  Logger LOGGER = LoggerFactory.getLogger(LoginController.class);
 	/**
 	 * 
-	 * @Title: login   
-	 * @Description: TODO
-	 * @author: lijunliang 
-	 * @date:   2019年1月24日 上午12:55:46   
-	 * @param: @param request
-	 * @param: @param username
-	 * @param: @param password
-	 * @param: @return      
-	 * @return: Result      
-	 * @throws
+	 * <p>方法名:  login </p> 
+	 * <p>描述:    登录 </p>
+	 * <p>创建时间:  2019年2月12日下午12:04:12 </p>
+	 * @version 1.0
+	 * @author lijunliang
+	 * @param request
+	 * @param username
+	 * @param password
+	 * @return  
+	 * Result
 	 */
 	@RequestMapping(value="/signin")
 	public Result login(HttpServletRequest request, String username, String password) {
@@ -51,26 +53,33 @@ public class LoginController {
 		AuthenticationToken token = createToken(username, password, CustomWebUtils.getRemoteIpAddr(request));
 		try {
 			Subject subject = SecurityUtils.getSubject();
+			String user = (String) subject.getPrincipal();
+			if(null != user &&  user.equals(username)){
+	            result.setData(token.getPrincipal());
+	            result.setCode(ApiCodeEnum.API_AUTHORITY);
+	            return result;
+			}
             subject.login(token);
+            LOGGER.info("登陆成功,对应的用户名为:{}",username);
+            result.setData(token.getPrincipal());
             result.setCode(ApiCodeEnum.SUCCESS);
             return result;
 		}catch (AuthenticationException e) {
-			LOGGER.info("登陆失败,对应的用户名为:{},{}",username,e);
-			//登录错误，回到登录页面
+			LOGGER.info("登陆失败,对应的用户名为:{}",username);
+			//登录错误，返回失败码
 			result.setCode(ApiCodeEnum.USER_NAME_OR_PWD);
         	return result;
 		}
 	}
 	/**
 	 * 
-	 * @Title: logout   
-	 * @Description: TODO
-	 * @author: lijunliang 
-	 * @date:   2019年1月24日 上午1:01:35   
-	 * @param: @param request
-	 * @param: @return      
-	 * @return: Result      
-	 * @throws
+	 * <p>方法名:  logout </p> 
+	 * <p>描述:    登出 </p>
+	 * <p>创建时间:  2019年2月12日下午12:45:34 </p>
+	 * @version 1.0
+	 * @author lijunliang
+	 * @return  
+	 * Result
 	 */
 	@RequestMapping(value="/signout")
 	public Result logout() {
@@ -78,13 +87,26 @@ public class LoginController {
 		Subject subject = SecurityUtils.getSubject();
         try {
             subject.logout();
+            LOGGER.info("用户{}登出系统",subject.getPrincipal());
         } catch (SessionException ise) {
-        	LOGGER.debug("Encountered session exception during logout.  This can generally safely be ignored.", ise);
+        	LOGGER.debug("登出错误:{}", ise);
         }
 		rs.setCode(ApiCodeEnum.SUCCESS);
 		return rs;
 	}
-	
+	/**
+	 * 
+	 * <p>方法名:  createToken </p> 
+	 * <p>描述:    创建token </p>
+	 * <p>创建时间:  2019年2月12日下午12:46:08 </p>
+	 * @version 1.0
+	 * @author lijunliang
+	 * @param username
+	 * @param password
+	 * @param host
+	 * @return  
+	 * AuthenticationToken
+	 */
 	private AuthenticationToken createToken(String username, String password, String host) {
 		return new UsernamePasswordToken(username, password, true, host);
 	}

@@ -5,8 +5,10 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.Deque;
 import java.util.LinkedList;
+
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+
 import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.CacheManager;
 import org.apache.shiro.session.Session;
@@ -15,6 +17,8 @@ import org.apache.shiro.session.mgt.DefaultSessionKey;
 import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.filter.AccessControlFilter;
+import org.crazycake.shiro.RedisCacheManager;
+import org.crazycake.shiro.serializer.ObjectSerializer;
 import org.saber.avalon.common.pojo.Result;
 import org.saber.avalon.common.pojo.api.ApiCodeEnum;
 import org.slf4j.Logger;

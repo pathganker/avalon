@@ -21,13 +21,13 @@
     <select id="getAll" resultMap="BaseResultMap"  >
        SELECT 
        <include refid="Base_Column_List" />
-       FROM sur_staff
+       FROM sur_staff_user
     </select>
 
     <select id="getOne" parameterType="java.lang.String" resultMap="BaseResultMap" >
         SELECT 
        <include refid="Base_Column_List" />
-       FROM sur_staff
+       FROM sur_staff_user
        WHERE id = #{id}
     </select>
 
@@ -41,7 +41,7 @@
     
     <update id="update" parameterType="org.saber.avalon.modules.system.pojo.dos.UserDO" >
        UPDATE 
-            sur_staff 
+            sur_staff_user 
        SET 
         <if test="username != null">username = #{username},</if>
         <if test="password != null">password = #{password},</if>
@@ -52,7 +52,7 @@
     
     <delete id="delete" parameterType="java.lang.String" >
        UPDATE 
-             sur_staff
+             sur_staff_user
        SET
              is_delete=1 
        WHERE 
@@ -63,8 +63,8 @@
         SELECT
         <include refid="Base_Column_List" />
         FROM 
-            sur_staff
+            sur_staff_user
         WHERE 
-            username = #{username}
+            is_delete=0 and username = #{username}
     </select>
 </mapper>
