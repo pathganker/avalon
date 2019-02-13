@@ -8,6 +8,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
+import org.apache.shiro.authc.IncorrectCredentialsException;
+import org.apache.shiro.authc.UnknownAccountException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.session.SessionException;
 import org.apache.shiro.subject.Subject;
@@ -64,7 +66,12 @@ public class LoginController {
             result.setData(token.getPrincipal());
             result.setCode(ApiCodeEnum.SUCCESS);
             return result;
-		}catch (AuthenticationException e) {
+		}catch (UnknownAccountException e) {
+			LOGGER.info("登陆失败,对应的用户名为:{}",username);
+			//登录错误，返回失败码
+			result.setCode(ApiCodeEnum.USER_NAME_OR_PWD);
+        	return result;
+		}catch(IncorrectCredentialsException e) {
 			LOGGER.info("登陆失败,对应的用户名为:{}",username);
 			//登录错误，返回失败码
 			result.setCode(ApiCodeEnum.USER_NAME_OR_PWD);

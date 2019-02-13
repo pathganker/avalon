@@ -17,8 +17,6 @@ import org.apache.shiro.session.mgt.DefaultSessionKey;
 import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.filter.AccessControlFilter;
-import org.crazycake.shiro.RedisCacheManager;
-import org.crazycake.shiro.serializer.ObjectSerializer;
 import org.saber.avalon.common.pojo.Result;
 import org.saber.avalon.common.pojo.api.ApiCodeEnum;
 import org.slf4j.Logger;
@@ -113,7 +111,8 @@ public class KickoutSessionControlFilter extends AccessControlFilter {
 				LOGGER.info("并发登陆控制出现错误",e);
 			}
 		}
-		// 如果被踢出了，直接退出，重定向到踢出后的地址
+		//  更新kickout cache 
+		cache.put(username, deque);
 		if (session.getAttribute("kickout") != null) {
 			Result rt = new Result();
 			// 会话被踢出了

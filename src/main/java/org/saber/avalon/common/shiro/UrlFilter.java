@@ -45,30 +45,30 @@ public class UrlFilter extends AccessControlFilter {
 
 	@Override
 	protected boolean isAccessAllowed(ServletRequest request,
-			ServletResponse response, Object mappedValue) throws Exception {
-		if (isLoginRequest(request, response)) {
-            return true;
-        } else {
-        	Subject subject = getSubject(request, response);
-            //根据username取到权限url集合
-        	@SuppressWarnings("unchecked")
-            Set<String> urls = (Set<String>)  subject.getSession().getAttribute(PERMISSIONS_URL_SESSION_KEY);
-        	if (urls == null) {
-        		urls = (userService.requestPermiUrlsByName((String) subject.getPrincipal()) == null) ? new HashSet<String>():userService.requestPermiUrlsByName((String) subject.getPrincipal());
-                subject.getSession().setAttribute(PERMISSIONS_URL_SESSION_KEY, urls);
-            }
-            boolean hasPermission = urls == null ? false : checkPermission(urls, request);
-            if (!hasPermission) {
-            	Result rt = new Result();
-            	rt.setCode(ApiCodeEnum.API_AUTHORITY);
-            	HandlerUtils.handlerReturnJSON(response, rt);
-                return false;
-			} else {
-				return true;
-			}
-            
+		ServletResponse response, Object mappedValue) throws Exception {
+    	Subject subject = getSubject(request, response);
+		if (!subject.isAuthenticated() && !subject.isRemembered()) {
+			// 如果没有登录，直接进行之后的流程
+			return false;
+		}
+        //根据username取到权限url集合
+    	@SuppressWarnings("unchecked")
+        Set<String> urls = (Set<String>)  subject.getSession().getAttribute(PERMISSIONS_URL_SESSION_KEY);
+    	if (urls == null) {
+    		urls = (userService.requestPermiUrlsByName((String) subject.getPrincipal()) == null) ? new HashSet<String>():userService.requestPermiUrlsByName((String) subject.getPrincipal());
+            subject.getSession().setAttribute(PERMISSIONS_URL_SESSION_KEY, urls);
         }
-	}
+        boolean hasPermission = urls == null ? false : checkPermission(urls, request);
+        if (!hasPermission) {
+        	Result rt = new Result();
+        	rt.setCode(ApiCodeEnum.API_AUTHORITY);
+        	HandlerUtils.handlerReturnJSON(response, rt);
+            return false;
+		} else {
+			return true;
+		}
+        
+    }
 	
 	/**
 	 * 
