@@ -19,12 +19,9 @@ import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.crazycake.shiro.RedisCacheManager;
 import org.crazycake.shiro.RedisManager;
 import org.crazycake.shiro.RedisSessionDAO;
-import org.saber.avalon.common.service.api.impl.TokenServiceImpl;
 import org.saber.avalon.common.shiro.KickoutSessionControlFilter;
-import org.saber.avalon.common.shiro.TokenFilter;
 import org.saber.avalon.common.shiro.UrlFilter;
 import org.saber.avalon.common.shiro.UserRealm;
-import org.saber.avalon.common.shiro.serializer.FastJsonRedisSerializer;
 import org.saber.avalon.modules.system.service.impl.UserServiceImpl;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -61,8 +58,8 @@ public class ShiroConfig {
 		userRealm.setCredentialsMatcher(credentialsMatcher());
 		userRealm.setCachingEnabled(true);
 		userRealm.setRedisCacheManager(cacheManager());
-		userRealm.setAuthenticationCachingEnabled(true);
-		userRealm.setAuthenticationCacheName("authenticationCache");
+//		userRealm.setAuthenticationCachingEnabled(true);
+//		userRealm.setAuthenticationCacheName("authenticationCache");
 		return userRealm;
 	}
 
@@ -170,15 +167,15 @@ public class ShiroConfig {
 		return new AnonymousFilter(); 
 	}
 	
-	private TokenServiceImpl tokenService() {
-		return new TokenServiceImpl();
-	}
+//	private TokenServiceImpl tokenService() {
+//		return new TokenServiceImpl();
+//	}
 	//Token验证
-	private TokenFilter tokenFilter() {
-		TokenFilter tokenFilter = new TokenFilter();
-		tokenFilter.setTokenService(tokenService());
-		return tokenFilter;
-	}
+//	private TokenFilter tokenFilter() {
+//		TokenFilter tokenFilter = new TokenFilter();
+//		tokenFilter.setTokenService(tokenService());
+//		return tokenFilter;
+//	}
 	//web过滤器
 	@Bean
 	public ShiroFilterFactoryBean shiroFilter() {
@@ -186,13 +183,13 @@ public class ShiroConfig {
 		shiroFilter.setSecurityManager(securityManager());
 		Map<String, Filter> filterMap = new LinkedHashMap<String, Filter>();
 		filterMap.put("kickout", kickoutFilter());
-		filterMap.put("token", tokenFilter());
+//		filterMap.put("token", tokenFilter());
 		filterMap.put("url", urlFilter());
 		filterMap.put("anon", anon());
 		shiroFilter.setFilters(filterMap);
 		Map<String, String> filterChainDefinitionMap = new LinkedHashMap<String, String>();
 		filterChainDefinitionMap.put("/login/**", "anon");
-		filterChainDefinitionMap.put("/**", "kickout,token,url");
+		filterChainDefinitionMap.put("/**", "kickout,url");
 		shiroFilter.setFilterChainDefinitionMap(filterChainDefinitionMap);
 		return shiroFilter;
 	}
