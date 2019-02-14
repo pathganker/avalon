@@ -9,10 +9,11 @@ import org.saber.avalon.common.pojo.api.ApiCodeEnum;
 
 /**
  * 
- * @ClassName:  APIException   
- * @Description:TODO
- * @author: lijunliang 
- * @date:   2018年10月29日 下午10:36:47   
+ * <p>类名称: APIException </p> 
+ * <p>描述: TODO  </p>
+ * <p>创建时间 : 2019年2月14日 下午9:06:09 </p>
+ * @author lijunliang
+ * @version 1.0
  *
  */
   	

@@ -42,33 +42,39 @@ public class UrlFilter extends AccessControlFilter {
 	 */
 	public UrlFilter() {
 	}
-
+	/**
+	 * (non-Javadoc)
+	 * @see org.apache.shiro.web.filter.AccessControlFilter#isAccessAllowed(javax.servlet.ServletRequest, javax.servlet.ServletResponse, java.lang.Object)
+	 */
 	@Override
 	protected boolean isAccessAllowed(ServletRequest request,
 			ServletResponse response, Object mappedValue) throws Exception {
-		if (isLoginRequest(request, response)) {
-            return true;
-        } else {
-        	Subject subject = getSubject(request, response);
-            //根据username取到权限url集合
-        	@SuppressWarnings("unchecked")
-            Set<String> urls = (Set<String>)  subject.getSession().getAttribute(PERMISSIONS_URL_SESSION_KEY);
-        	if (urls == null) {
-        		urls = (userService.requestPermiUrlsByName((String) subject.getPrincipal()) == null) ? new HashSet<String>():userService.requestPermiUrlsByName((String) subject.getPrincipal());
-                subject.getSession().setAttribute(PERMISSIONS_URL_SESSION_KEY, urls);
-            }
-            boolean hasPermission = urls == null ? false : checkPermission(urls, request);
-            if (!hasPermission) {
-            	Result rt = new Result();
-            	rt.setCode(ApiCodeEnum.API_AUTHORITY);
-            	HandlerUtils.handlerReturnJSON(response, rt);
-                return false;
-			} else {
-				return true;
-			}
-            
+    	Result rt = new Result();
+    	Subject subject = getSubject(request, response);
+    	//未登录 拒绝访问
+		if (!subject.isAuthenticated() && !subject.isRemembered()) {
+        	rt.setCode(ApiCodeEnum.API_AUTHORITY);
+        	HandlerUtils.handlerReturnJSON(response, rt);
+			return false;
+		}
+        //根据username取到权限url集合
+    	@SuppressWarnings("unchecked")
+        Set<String> urls = (Set<String>)  subject.getSession().getAttribute(PERMISSIONS_URL_SESSION_KEY);
+    	if (urls == null) {
+    		urls = (userService.requestPermiUrlsByName((String) subject.getPrincipal()) == null) ? new HashSet<String>():userService.requestPermiUrlsByName((String) subject.getPrincipal());
+            subject.getSession().setAttribute(PERMISSIONS_URL_SESSION_KEY, urls);
         }
-	}
+        boolean hasPermission = urls == null ? false : checkPermission(urls, request);
+        if (!hasPermission) {
+
+        	rt.setCode(ApiCodeEnum.API_AUTHORITY);
+        	HandlerUtils.handlerReturnJSON(response, rt);
+            return false;
+		} else {
+			return true;
+		}
+        
+    }
 	
 	/**
 	 * 

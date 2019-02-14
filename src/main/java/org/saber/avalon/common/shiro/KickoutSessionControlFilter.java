@@ -17,8 +17,6 @@ import org.apache.shiro.session.mgt.DefaultSessionKey;
 import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.filter.AccessControlFilter;
-import org.crazycake.shiro.RedisCacheManager;
-import org.crazycake.shiro.serializer.ObjectSerializer;
 import org.saber.avalon.common.pojo.Result;
 import org.saber.avalon.common.pojo.api.ApiCodeEnum;
 import org.slf4j.Logger;
@@ -74,12 +72,12 @@ public class KickoutSessionControlFilter extends AccessControlFilter {
 	@Override
 	protected boolean onAccessDenied(ServletRequest request, ServletResponse response) throws Exception {
 		Subject subject = getSubject(request, response);
+		String username = (String) subject.getPrincipal();
 		if (!subject.isAuthenticated() && !subject.isRemembered()) {
 			// 如果没有登录，直接进行之后的流程
 			return true;
 		}
 		Session session = subject.getSession();
-		String username = (String) subject.getPrincipal();
 		Serializable sessionId = session.getId();
 		Cache<String, Deque<Serializable>> cache = cacheManager.getCache("shiro-kickout-session");
 		Deque<Serializable> deque = cache.get(username);
@@ -91,6 +89,7 @@ public class KickoutSessionControlFilter extends AccessControlFilter {
 		if (!deque.contains(sessionId)
 				&& session.getAttribute("kickout") == null) {
 			deque.push(sessionId);
+			cache.put(username, deque);
 		}
 		// 如果队列里的sessionId数超出最大会话数，开始踢人
 		while (deque.size() > maxSession) {
@@ -100,12 +99,13 @@ public class KickoutSessionControlFilter extends AccessControlFilter {
 			} else { // 否则踢出前者
 				kickoutSessionId = deque.removeLast();
 			}
+			cache.put(username, deque);
 			try {
 				Session kickoutSession = sessionManager.getSession(new DefaultSessionKey(kickoutSessionId));
 				if (kickoutSession != null) {
 					// 设置会话的kickout属性表示踢出了
 					kickoutSession.setAttribute("kickout", true);
-				//	kickoutSession.setTimeout(0);
+//					kickoutSession.setTimeout(0);
 				}
 			} catch (UnknownSessionException e) {
 				LOGGER.debug("unknow session id:{}", kickoutSessionId);
@@ -144,7 +144,6 @@ public class KickoutSessionControlFilter extends AccessControlFilter {
 				out.close();
 			}
 		}
-
 	}
 	
 	/**

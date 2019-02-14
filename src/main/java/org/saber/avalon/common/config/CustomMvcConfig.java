@@ -4,9 +4,6 @@
 package org.saber.avalon.common.config;
 
 
-import org.saber.avalon.common.web.interceptor.TokenInterceptor;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -21,10 +18,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  */
 //@Configuration
 public class CustomMvcConfig implements WebMvcConfigurer{
-	@Bean
-	public TokenInterceptor tokenInterceptor() {
-		return new TokenInterceptor();
-	}
 	/**
 	 */
 	@Override
