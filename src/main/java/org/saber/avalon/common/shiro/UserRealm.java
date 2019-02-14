@@ -11,9 +11,7 @@ import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.cache.Cache;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.util.ByteSource;
-import org.crazycake.shiro.RedisCacheManager;
 import org.saber.avalon.common.shiro.realm.AuthorizingRealm;
-import org.saber.avalon.common.shiro.serializer.FastJsonRedisSerializer;
 import org.saber.avalon.modules.system.pojo.dtos.UserDTO;
 import org.saber.avalon.modules.system.service.IUserService;
 
@@ -41,7 +39,6 @@ public class UserRealm extends AuthorizingRealm {
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
         String username = (String)principals.getPrimaryPrincipal();
-
         SimpleAuthorizationInfo authorizationInfo = new SimpleAuthorizationInfo();
         authorizationInfo.setRoles(userService.requestRoleIdByName(username));
         authorizationInfo.setStringPermissions(userService.requestPermiUrlsByName(username));
@@ -133,8 +130,8 @@ public class UserRealm extends AuthorizingRealm {
         this.userService = userService;
     }
     
-    public void setRedisCacheManager(RedisCacheManager cacheManager){
-    	cacheManager.setValueSerializer(new FastJsonRedisSerializer<SimpleAuthenticationInfo>(SimpleAuthenticationInfo.class));
-    	this.setCacheManager(cacheManager);
-    }
+//    public void setRedisCacheManager(RedisCacheManager cacheManager){
+//    	cacheManager.setValueSerializer(new FastJsonRedisSerializer<SimpleAuthenticationInfo>(SimpleAuthenticationInfo.class));
+//    	this.setCacheManager(cacheManager);
+//    }
 }

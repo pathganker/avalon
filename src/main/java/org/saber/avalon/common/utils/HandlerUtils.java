@@ -12,11 +12,14 @@ import org.slf4j.LoggerFactory;
 
 import com.alibaba.fastjson.JSON;
 
-/**   
- * 类名称:  handlerUtils   
- * 描述: handler工具类   
- * 创建人: lijunliang
- * 创建时间:   2019年2月11日 下午6:47:12   
+/**
+ * 
+ * <p>类名称: HandlerUtils </p> 
+ * <p>描述: TODO  </p>
+ * <p>创建时间 : 2019年2月14日 下午9:15:22 </p>
+ * @author lijunliang
+ * @version 1.0
+ *
  */
 public class HandlerUtils {
 	

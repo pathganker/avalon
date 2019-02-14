@@ -69,13 +69,12 @@ public class LoginController {
 			LOGGER.info("登陆失败,对应的用户名为:{}",username);
 			//登录错误，返回失败码
 			result.setCode(ApiCodeEnum.USER_NAME_OR_PWD);
-        	return result;
 		}catch(IncorrectCredentialsException e) {
 			LOGGER.info("登陆失败,对应的用户名为:{}",username);
 			//登录错误，返回失败码
 			result.setCode(ApiCodeEnum.USER_NAME_OR_PWD);
-        	return result;
 		}
+		return result;
 	}
 	/**
 	 * 

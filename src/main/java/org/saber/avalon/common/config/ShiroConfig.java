@@ -39,7 +39,7 @@ import org.springframework.context.annotation.Configuration;
 public class ShiroConfig {
 	
 	//凭证管理
-	public HashedCredentialsMatcher credentialsMatcher(){
+	private HashedCredentialsMatcher credentialsMatcher(){
 		HashedCredentialsMatcher credentialsMatcher = new HashedCredentialsMatcher();
 		credentialsMatcher.setHashAlgorithmName("md5");
 		credentialsMatcher.setHashIterations(2);
@@ -57,7 +57,7 @@ public class ShiroConfig {
 		userRealm.setUserService(userService());
 		userRealm.setCredentialsMatcher(credentialsMatcher());
 		userRealm.setCachingEnabled(true);
-		userRealm.setRedisCacheManager(cacheManager());
+		userRealm.setCacheManager(cacheManager());
 //		userRealm.setAuthenticationCachingEnabled(true);
 //		userRealm.setAuthenticationCacheName("authenticationCache");
 		return userRealm;
@@ -166,16 +166,6 @@ public class ShiroConfig {
 	private AnonymousFilter anon(){
 		return new AnonymousFilter(); 
 	}
-	
-//	private TokenServiceImpl tokenService() {
-//		return new TokenServiceImpl();
-//	}
-	//Token验证
-//	private TokenFilter tokenFilter() {
-//		TokenFilter tokenFilter = new TokenFilter();
-//		tokenFilter.setTokenService(tokenService());
-//		return tokenFilter;
-//	}
 	//web过滤器
 	@Bean
 	public ShiroFilterFactoryBean shiroFilter() {
@@ -183,7 +173,6 @@ public class ShiroConfig {
 		shiroFilter.setSecurityManager(securityManager());
 		Map<String, Filter> filterMap = new LinkedHashMap<String, Filter>();
 		filterMap.put("kickout", kickoutFilter());
-//		filterMap.put("token", tokenFilter());
 		filterMap.put("url", urlFilter());
 		filterMap.put("anon", anon());
 		shiroFilter.setFilters(filterMap);
