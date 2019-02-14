@@ -55,7 +55,7 @@ public class UrlFilter extends AccessControlFilter {
 		if (!subject.isAuthenticated() && !subject.isRemembered()) {
         	rt.setCode(ApiCodeEnum.API_AUTHORITY);
         	HandlerUtils.handlerReturnJSON(response, rt);
-			return false;
+        	return false;
 		}
         //根据username取到权限url集合
     	@SuppressWarnings("unchecked")
@@ -66,15 +66,13 @@ public class UrlFilter extends AccessControlFilter {
         }
         boolean hasPermission = urls == null ? false : checkPermission(urls, request);
         if (!hasPermission) {
-
         	rt.setCode(ApiCodeEnum.API_AUTHORITY);
         	HandlerUtils.handlerReturnJSON(response, rt);
             return false;
 		} else {
 			return true;
 		}
-        
-    }
+	}
 	
 	/**
 	 * 
