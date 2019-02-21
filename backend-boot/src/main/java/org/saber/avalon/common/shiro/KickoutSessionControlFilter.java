@@ -1,7 +1,5 @@
 package org.saber.avalon.common.shiro;
 
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.Deque;
 import java.util.LinkedList;
@@ -19,10 +17,9 @@ import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.filter.AccessControlFilter;
 import org.saber.avalon.common.pojo.Result;
 import org.saber.avalon.common.pojo.api.ApiCodeEnum;
+import org.saber.avalon.common.utils.HandlerUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.alibaba.fastjson.JSON;
 
 /**
  * 
@@ -126,25 +123,10 @@ public class KickoutSessionControlFilter extends AccessControlFilter {
 				rt.setCode(ApiCodeEnum.SERVICE_WRONG);
 			}
 			saveRequest(request);
-			handlerReturnJSON(response,rt);
+			HandlerUtils.handlerReturnJSON(response,rt);
 			return false;
 		}
 		return true;
-	}
-	
-	private void handlerReturnJSON(ServletResponse response, Result rt) {
-		response.setContentType("application/json; charset=utf-8");
-		PrintWriter out = null;
-		try {
-			out = response.getWriter();
-			out.append(JSON.toJSONString(rt));
-		} catch (IOException e) {
-			LOGGER.info("返回登录验证失败异常:{}", e);		
-		} finally {
-			if (out != null) {
-				out.close();
-			}
-		}
 	}
 	
 	/**
